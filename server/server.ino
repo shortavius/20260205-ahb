@@ -15,6 +15,7 @@
 #include "src/hw/serial/hw_serial.h"
 #include "src/cpe/cpe.h"
 #include "src/ntwrk/ntwrk.h"
+#include "src/ledbar/ledbar.h"
 
 //
 // Local Definitions
@@ -58,6 +59,9 @@ void setup()
     // Setup the heart beat
     hrtbt_cfg();
 
+    // Setup the LED bar
+    ledbar_cfg();
+
     // Setup the console
     hw_serial_init_uart((unsigned long)CONSOLE_BAUD);
     app.hw_uart = console_init(
@@ -87,6 +91,9 @@ void loop()
 
     // Perform heart beat actions
     hrtbt_action();
+
+    // Perform LED bar actions
+    ledbar_action();
 
     // Perform network actions
     ntwrk_action(app.ssid);
