@@ -1,0 +1,3 @@
+# Server project .gitignore file
+/.vscode/
+/build/
