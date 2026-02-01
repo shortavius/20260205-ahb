@@ -90,7 +90,7 @@ static led_t ledbar_leds[BAR_LED_COUNT] =
         {
             .active_type = (enum pin_active_types)PIN_ACTIVE_LOW,
             .number = (pin_size_t)LED_BAR_1_PIN,
-            .state = (enum pin_states)PIN_STATE_MAX
+            .state = (enum pin_states)PIN_STATE_OFF
         },
         .delay_msecs = (uint64_t)LED_DEFAULT_BLINK_MSECS,
         .next_toggle_time_msecs = (uint64_t)0
@@ -101,7 +101,7 @@ static led_t ledbar_leds[BAR_LED_COUNT] =
         {
             .active_type = (enum pin_active_types)PIN_ACTIVE_LOW,
             .number = (pin_size_t)LED_BAR_2_PIN,
-            .state = (enum pin_states)PIN_STATE_MAX
+            .state = (enum pin_states)PIN_STATE_OFF
         },
         .delay_msecs = (uint64_t)LED_DEFAULT_BLINK_MSECS,
         .next_toggle_time_msecs = (uint64_t)0
@@ -112,7 +112,7 @@ static led_t ledbar_leds[BAR_LED_COUNT] =
         {
             .active_type = (enum pin_active_types)PIN_ACTIVE_LOW,
             .number = (pin_size_t)LED_BAR_3_PIN,
-            .state = (enum pin_states)PIN_STATE_MAX
+            .state = (enum pin_states)PIN_STATE_OFF
         },
         .delay_msecs = (uint64_t)LED_DEFAULT_BLINK_MSECS,
         .next_toggle_time_msecs = (uint64_t)0
@@ -123,7 +123,7 @@ static led_t ledbar_leds[BAR_LED_COUNT] =
         {
             .active_type = (enum pin_active_types)PIN_ACTIVE_LOW,
             .number = (pin_size_t)LED_BAR_4_PIN,
-            .state = (enum pin_states)PIN_STATE_MAX
+            .state = (enum pin_states)PIN_STATE_OFF
         },
         .delay_msecs = (uint64_t)LED_DEFAULT_BLINK_MSECS,
         .next_toggle_time_msecs = (uint64_t)0
@@ -134,12 +134,16 @@ static led_t ledbar_leds[BAR_LED_COUNT] =
         {
             .active_type = (enum pin_active_types)PIN_ACTIVE_LOW,
             .number = (pin_size_t)LED_BAR_5_PIN,
-            .state = (enum pin_states)PIN_STATE_MAX
+            .state = (enum pin_states)PIN_STATE_OFF
         },
         .delay_msecs = (uint64_t)LED_DEFAULT_BLINK_MSECS,
         .next_toggle_time_msecs = (uint64_t)0
     }
 };
+
+static char * mode_msg_blinking = "BLINKING";
+static char * mode_msg_static_on = "STATIC ON";
+static char * mode_msg_static_off = "STATIC OFF";
 
 static void pin_assert(led_pin * p_pin);
 static void pin_deassert(led_pin * p_pin);
@@ -156,9 +160,47 @@ void ledbar_cfg(void)
     }
 }
 
+uint64_t ledbar_get_delay_msecs(int led)
+{
+    uint64_t rv = 0u;
+
+    if ((int)BAR_LED_COUNT > led)
+    {
+        rv = ledbar_leds[led].delay_msecs;
+    }
+
+    return rv;
+}
+
+char * ledbar_get_mode(int led)
+{
+    char * rv = NULL;
+
+    if ((int)BAR_LED_COUNT > led)
+    {
+        if ((enum led_modes)LED_MODE_BLINK == ledbar_leds[led].mode)
+        {
+            rv = mode_msg_blinking;
+        }
+        else
+        {
+            if ((enum pin_states)PIN_STATE_ON == ledbar_leds[led].pin.state)
+            {
+                rv = mode_msg_static_on;
+            }
+            else
+            {
+                rv = mode_msg_static_off;
+            }
+        }
+    }
+
+    return rv;
+}
+
 void ledbar_set_led_mode(
     int led,
-    led_commands cmd)
+    enum led_commands cmd)
 {
     if ((int)BAR_LED_COUNT <= led) { return; }
 

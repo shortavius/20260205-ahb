@@ -45,6 +45,8 @@ enum led_commands
 };
 
 void ledbar_cfg(void);
+uint64_t ledbar_get_delay_msecs(int led);
+char * ledbar_get_mode(int led);
 void ledbar_set_led_mode(
     int led,
     enum led_commands cmd);
