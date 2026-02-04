@@ -36,10 +36,17 @@ BEGIN_C_DECLS
 //
 // Local Structures / Enumerations / Type Definitions
 //
+struct udp_rxtx_ports
+{
+    uint16_t port_rx;
+    uint16_t port_tx;
+};
+
 struct ntwrk_info
 {
     struct ssid_info ssid;
     uint8_t status;
+    struct udp_rxtx_ports ports;
 };
 
 //
@@ -93,6 +100,30 @@ char *
 ntwrk_get_ssid_pass(void)
 {
     return (char *)nw_info.ssid.pass;
+}
+
+uint16_t
+ntwrk_get_udp_rx_port(void)
+{
+    return nw_info.ports.port_rx;
+}
+
+void
+ntwrk_set_udp_rx_port(uint16_t port)
+{
+    nw_info.ports.port_rx = port;
+}
+
+uint16_t
+ntwrk_get_udp_tx_port(void)
+{
+    return nw_info.ports.port_tx;
+}
+
+void
+ntwrk_set_udp_tx_port(uint16_t port)
+{
+    nw_info.ports.port_tx = port;
 }
 
 END_C_DECLS
