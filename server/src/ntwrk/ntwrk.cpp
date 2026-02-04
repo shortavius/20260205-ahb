@@ -36,10 +36,18 @@ BEGIN_C_DECLS
 //
 // Local Structures / Enumerations / Type Definitions
 //
+struct udp_rxtx_ports
+{
+    uint16_t port_rx;
+    uint16_t port_tx;
+};
+
 struct ntwrk_info
 {
     struct ssid_info ssid;
     uint8_t status;
+    WiFiUDP udp;
+    struct udp_rxtx_ports ports;
 };
 
 //
@@ -65,12 +73,16 @@ void
 ntwrk_action(struct ssid_info * ssid)
 {
     nw_info.status = WiFi.status();
+
+    if (WL_CONNECTED != nw_info.status) { return; }
 }
 
 struct ssid_info *
 ntwrk_cfg(void)
 {
     nw_info.status = WiFi.status();
+    nw_info.ports.port_rx = 0u;
+    nw_info.ports.port_tx = 0u;
     (void)memset(nw_info.ssid.name, '\0', COUNT_OF(nw_info.ssid.name));
     (void)memset(nw_info.ssid.pass, '\0', COUNT_OF(nw_info.ssid.pass));
 
@@ -93,6 +105,30 @@ char *
 ntwrk_get_ssid_pass(void)
 {
     return (char *)nw_info.ssid.pass;
+}
+
+uint16_t
+ntwrk_get_udp_rx_port(void)
+{
+    return nw_info.ports.port_rx;
+}
+
+void
+ntwrk_set_udp_rx_port(uint16_t port)
+{
+    nw_info.ports.port_rx = port;
+}
+
+uint16_t
+ntwrk_get_udp_tx_port(void)
+{
+    return nw_info.ports.port_tx;
+}
+
+void
+ntwrk_set_udp_tx_port(uint16_t port)
+{
+    nw_info.ports.port_tx = port;
 }
 
 END_C_DECLS
