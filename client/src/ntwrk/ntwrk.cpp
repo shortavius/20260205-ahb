@@ -15,7 +15,9 @@
 
 #include <string.h>
 
+#include <WiFi.h>
 #include <WiFiNINA.h>
+#include <ArduinoJson.h>
 
 #undef BEGIN_C_DECLS
 #undef END_C_DECLS
@@ -32,6 +34,8 @@ BEGIN_C_DECLS
 //
 // Local Definitions
 //
+#define JSON_MEMORY_SIZE                    1024
+#define UDP_TX_PACKET_SIZE                  1024
 
 //
 // Local Structures / Enumerations / Type Definitions
@@ -46,6 +50,7 @@ struct ntwrk_info
 {
     struct ssid_info ssid;
     uint8_t status;
+    WiFiUDP udp;
     struct udp_rxtx_ports ports;
 };
 
@@ -125,5 +130,38 @@ ntwrk_set_udp_tx_port(uint16_t port)
 {
     nw_info.ports.port_tx = port;
 }
+
+String
+ntwrk_build_pkt(int led, const char * mode, int delay)
+{
+    String pkt;
+
+    StaticJsonDocument<JSON_MEMORY_SIZE> doc;
+    doc["led"] = led;
+    doc["mode"] = mode;
+    doc["delay"] = delay;
+    serializeJson(doc, pkt);
+
+    return pkt;
+}
+
+void
+ntwrk_send_pkt(IPAddress ip, String pkt)
+{
+    char tx_buf[UDP_TX_PACKET_SIZE] = { 0 };
+
+    pkt.toCharArray(tx_buf, (unsigned)UDP_TX_PACKET_SIZE);
+    nw_info.udp.beginPacket(ip, nw_info.ports.port_tx);
+    nw_info.udp.write(tx_buf, pkt.length());
+    nw_info.udp.endPacket();
+}
+
+void
+ntwrk_udp_srvr_start(void)
+{
+    nw_info.udp.begin((uint16_t)1234);
+}
+
+
 
 END_C_DECLS

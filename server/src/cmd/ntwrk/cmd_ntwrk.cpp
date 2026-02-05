@@ -31,7 +31,7 @@ BEGIN_C_DECLS
 //
 // Local Definitions
 //
-#define NTWRK_NUM_COMMANDS                  15
+#define NTWRK_NUM_COMMANDS                  17
 
 //
 // Local Structures / Enumerations / Type Definitions
@@ -55,6 +55,8 @@ static void cmd_ntwrk_set_ssid_name_str(void * x);
 static void cmd_ntwrk_set_ssid_pass_str(void * x);
 static void cmd_ntwrk_set_tx_port_int(void * x);
 static void cmd_ntwrk_status(void * x);
+static void cmd_ntwrk_udp_srvr_start(void * x);
+static void cmd_ntwrk_udp_srvr_stop(void * x);
 
 //
 // Local Global Variables
@@ -235,6 +237,46 @@ const static struct cpe_syntax_tkn syntax_ntwrk_get_tx_port_tkns[4] =
     },
 };
 
+const static struct cpe_syntax_tkn syntax_ntwrk_udp_srvr_start_tkns[4] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_UDP
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_SRVR
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_START
+    },
+};
+
+const static struct cpe_syntax_tkn syntax_ntwrk_udp_srvr_stop_tkns[4] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_UDP
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_SRVR
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_STOP
+    },
+};
+
 const static struct cpe_syntax_tkn syntax_ntwrk_set_rx_port_int_tkns[5] =
 {
     {
@@ -388,6 +430,16 @@ const struct cpe_cmd_syntax syntax_cmd_ntwrk[NTWRK_NUM_COMMANDS] =
         .syntax_tkns = &syntax_ntwrk_get_tx_port_tkns[0],
         .action = cmd_ntwrk_get_tx_port
     },
+    {
+        .count = 4,
+        .syntax_tkns = &syntax_ntwrk_udp_srvr_start_tkns[0],
+        .action = cmd_ntwrk_udp_srvr_start
+    },
+/*    {
+        .count = 4,
+        .syntax_tkns = &syntax_ntwrk_udp_srvr_stop_tkns[0],
+        .action = cmd_ntwrk_udp_srvr_stop
+    }, */
     {
         .count = 5,
         .syntax_tkns = &syntax_ntwrk_set_rx_port_int_tkns[0],
@@ -745,5 +797,37 @@ static void cmd_ntwrk_status(void * x)
             break;
     }
 }
+
+static void cmd_ntwrk_udp_srvr_start(void * x)
+{
+    (void)x;
+    struct cpe_info * info = cpe_get_info();
+    struct uart_funcs * uart = cpe_get_info()->uart;
+    const uint16_t port = ntwrk_get_udp_rx_port();
+
+    if (0u == port)
+    {
+        console_printf(uart,
+            "UDP port must not be 0\r\n");
+        return;
+    }
+
+    ntwrk_udp_srvr_start();
+    console_printf(uart,
+        "UDP server: STARTED\r\n");
+}
+
+/*
+static void cmd_ntwrk_udp_srvr_stop(void * x)
+{
+    (void)x;
+    struct cpe_info * info = cpe_get_info();
+    struct uart_funcs * uart = cpe_get_info()->uart;
+
+    ntwrk_udp_srvr_stop();
+    console_printf(uart,
+        "UDP server: STOPPED\r\n");
+}
+*/
 
 END_C_DECLS

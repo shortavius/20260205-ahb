@@ -72,6 +72,9 @@ ntwrk_get_udp_tx_port(void);
 void
 ntwrk_set_udp_tx_port(uint16_t port);
 
+void
+ntwrk_udp_srvr_start(void);
+
 //
 // Shared Global Variables
 //
