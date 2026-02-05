@@ -6,7 +6,7 @@
 ///
 /// @details
 /// This is a helper module which deals with the Arduino Nano's UART, which is
-/// named Serial. 
+/// named Serial.
 
 //
 // Local Includes
@@ -63,13 +63,13 @@ hw_serial_init_uart(unsigned long baud)
     }
 }
 
-size_t 
+size_t
 (*hw_serial_get_read_fn(void)) (void * buff, size_t len)
 {
     return hw_serial_read;
 }
 
-size_t 
+size_t
 (*hw_serial_get_write_fn(void)) (const void * buff, size_t len)
 {
     return hw_serial_write;
