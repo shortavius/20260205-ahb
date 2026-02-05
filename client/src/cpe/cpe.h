@@ -37,7 +37,7 @@ BEGIN_C_DECLS
 
 #define CPE_MAX_LINE_SZ                     128u
 #define CPE_MAX_TOKENS_PER_LINE             14
-#define CPE_NUM_KEYWORDS                    15u
+#define CPE_NUM_KEYWORDS                    19u
 
 //
 // Shared Structures / Enumerations / Type Definitions
@@ -75,10 +75,14 @@ typedef enum
     CPE_KEYWORD_NTWRK,
     CPE_KEYWORD_PASS,
     CPE_KEYWORD_PING,
+    CPE_KEYWORD_PORT,
+    CPE_KEYWORD_RX,
     CPE_KEYWORD_SCAN,
+    CPE_KEYWORD_SEND,
     CPE_KEYWORD_SET,
     CPE_KEYWORD_SSID,
     CPE_KEYWORD_STATUS,
+    CPE_KEYWORD_TX,
     CPE_KEYWORD_MAX
 } cpe_token_keyword_t;
 

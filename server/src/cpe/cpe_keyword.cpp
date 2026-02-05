@@ -60,7 +60,14 @@ static const char * cpe_keyword_list[CPE_NUM_KEYWORDS] = {
     "static",
     "on",
     "off",
-    "blink"
+    "blink",
+    "rx",
+    "tx",
+    "port",
+    "udp",
+    "srvr",
+    "start",
+    "stop"
 };
 
 static const cpe_token_keyword_t cpe_keyword_list_code[CPE_NUM_KEYWORDS] = {
@@ -84,7 +91,14 @@ static const cpe_token_keyword_t cpe_keyword_list_code[CPE_NUM_KEYWORDS] = {
     (cpe_token_keyword_t)CPE_KEYWORD_STATIC,
     (cpe_token_keyword_t)CPE_KEYWORD_ON,
     (cpe_token_keyword_t)CPE_KEYWORD_OFF,
-    (cpe_token_keyword_t)CPE_KEYWORD_BLINK
+    (cpe_token_keyword_t)CPE_KEYWORD_BLINK,
+    (cpe_token_keyword_t)CPE_KEYWORD_RX,
+    (cpe_token_keyword_t)CPE_KEYWORD_TX,
+    (cpe_token_keyword_t)CPE_KEYWORD_PORT,
+    (cpe_token_keyword_t)CPE_KEYWORD_UDP,
+    (cpe_token_keyword_t)CPE_KEYWORD_SRVR,
+    (cpe_token_keyword_t)CPE_KEYWORD_START,
+    (cpe_token_keyword_t)CPE_KEYWORD_STOP,
 };
 
 //

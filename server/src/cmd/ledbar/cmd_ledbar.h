@@ -46,6 +46,7 @@ cmd_ledbar_root_help(void);
 
 uint8_t
 cmd_ledbar_syntax(void);
+
 //
 // Shared Global Variables
 //

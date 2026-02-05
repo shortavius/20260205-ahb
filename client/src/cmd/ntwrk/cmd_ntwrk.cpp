@@ -15,6 +15,7 @@
 #include "../../ntwrk/ntwrk.h"
 
 #include <WiFi.h>
+#include <WiFiNINA.h>
 
 #undef BEGIN_C_DECLS
 #undef END_C_DECLS
@@ -31,7 +32,7 @@ BEGIN_C_DECLS
 //
 // Local Definitions
 //
-#define NTWRK_NUM_COMMANDS                  11
+#define NTWRK_NUM_COMMANDS                  16
 
 //
 // Local Structures / Enumerations / Type Definitions
@@ -42,14 +43,19 @@ BEGIN_C_DECLS
 //
 static void cmd_ntwrk_connect(void * x);
 static void cmd_ntwrk_get_ip(void * x);
+static void cmd_ntwrk_get_rx_port(void *x);
 static void cmd_ntwrk_get_ssid(void * x);
 static void cmd_ntwrk_get_ssid_name(void * x);
 static void cmd_ntwrk_get_ssid_pass(void * x);
+static void cmd_ntwrk_get_tx_port(void *x);
 static void cmd_ntwrk_help(void * x);
 static void cmd_ntwrk_ping_decimal(void * x);
 static void cmd_ntwrk_scan(void * x);
+static void cmd_ntwrk_send_decimal_int_string_int(void * x);
+static void cmd_ntwrk_set_rx_port_int(void * x);
 static void cmd_ntwrk_set_ssid_name_str(void * x);
 static void cmd_ntwrk_set_ssid_pass_str(void * x);
+static void cmd_ntwrk_set_tx_port_int(void * x);
 static void cmd_ntwrk_status(void * x);
 
 //
@@ -151,6 +157,26 @@ const static struct cpe_syntax_tkn syntax_ntwrk_get_ssid_tkns[3] =
     },
 };
 
+const static struct cpe_syntax_tkn syntax_ntwrk_get_rx_port_tkns[4] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_GET
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_RX
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_PORT
+    },
+};
+
 const static struct cpe_syntax_tkn syntax_ntwrk_get_ssid_name_tkns[4] =
 {
     {
@@ -189,6 +215,50 @@ const static struct cpe_syntax_tkn syntax_ntwrk_get_ssid_pass_tkns[4] =
         .cat = CPE_TOKEN_CAT_KEYWORD,
         .kyw = CPE_KEYWORD_PASS
     },
+};
+
+const static struct cpe_syntax_tkn syntax_ntwrk_get_tx_port_tkns[4] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_GET
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_TX
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_PORT
+    },
+};
+
+const static struct cpe_syntax_tkn syntax_ntwrk_set_rx_port_int_tkns[5] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_SET
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_RX
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_PORT
+    },
+    {
+        .cat = CPE_TOKEN_CAT_INTEGER,
+        .kyw = CPE_KEYWORD_UNDEFINED
+    }
 };
 
 const static struct cpe_syntax_tkn syntax_ntwrk_get_ssid_name_str_tkns[5] =
@@ -239,6 +309,58 @@ const static struct cpe_syntax_tkn syntax_ntwrk_get_ssid_pass_str_tkns[5] =
     }
 };
 
+const static struct cpe_syntax_tkn syntax_ntwrk_set_tx_port_int_tkns[5] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_SET
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_TX
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_PORT
+    },
+    {
+        .cat = CPE_TOKEN_CAT_INTEGER,
+        .kyw = CPE_KEYWORD_UNDEFINED
+    }
+};
+
+const static struct cpe_syntax_tkn syntax_ntwrk_send_decimal_int_string_int_tkns[6] =
+{
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_NTWRK
+    },
+    {
+        .cat = CPE_TOKEN_CAT_KEYWORD,
+        .kyw = CPE_KEYWORD_SEND
+    },
+    {
+        .cat = CPE_TOKEN_CAT_DECIMAL,
+        .kyw = CPE_KEYWORD_UNDEFINED
+    },
+    {
+        .cat = CPE_TOKEN_CAT_INTEGER,
+        .kyw = CPE_KEYWORD_UNDEFINED
+    },
+    {
+        .cat = CPE_TOKEN_CAT_STRING,
+        .kyw = CPE_KEYWORD_UNDEFINED
+    },
+    {
+        .cat = CPE_TOKEN_CAT_INTEGER,
+        .kyw = CPE_KEYWORD_UNDEFINED
+    }
+};
+
 const struct cpe_cmd_syntax syntax_cmd_ntwrk[NTWRK_NUM_COMMANDS] =
 {
     {
@@ -278,6 +400,11 @@ const struct cpe_cmd_syntax syntax_cmd_ntwrk[NTWRK_NUM_COMMANDS] =
     },
     {
         .count = 4,
+        .syntax_tkns = &syntax_ntwrk_get_rx_port_tkns[0],
+        .action = cmd_ntwrk_get_rx_port
+    },
+    {
+        .count = 4,
         .syntax_tkns = &syntax_ntwrk_get_ssid_name_tkns[0],
         .action = cmd_ntwrk_get_ssid_name
     },
@@ -285,6 +412,16 @@ const struct cpe_cmd_syntax syntax_cmd_ntwrk[NTWRK_NUM_COMMANDS] =
         .count = 4,
         .syntax_tkns = &syntax_ntwrk_get_ssid_pass_tkns[0],
         .action = cmd_ntwrk_get_ssid_pass
+    },
+    {
+        .count = 4,
+        .syntax_tkns = &syntax_ntwrk_get_tx_port_tkns[0],
+        .action = cmd_ntwrk_get_tx_port
+    },
+    {
+        .count = 5,
+        .syntax_tkns = &syntax_ntwrk_set_rx_port_int_tkns[0],
+        .action = cmd_ntwrk_set_rx_port_int
     },
     {
         .count = 5,
@@ -295,6 +432,16 @@ const struct cpe_cmd_syntax syntax_cmd_ntwrk[NTWRK_NUM_COMMANDS] =
         .count = 5,
         .syntax_tkns = &syntax_ntwrk_get_ssid_pass_str_tkns[0],
         .action = cmd_ntwrk_set_ssid_pass_str
+    },
+    {
+        .count = 5,
+        .syntax_tkns = &syntax_ntwrk_set_tx_port_int_tkns[0],
+        .action = cmd_ntwrk_set_tx_port_int
+    },
+    {
+        .count = 6,
+        .syntax_tkns = &syntax_ntwrk_send_decimal_int_string_int_tkns[0],
+        .action = cmd_ntwrk_send_decimal_int_string_int
     }
 };
 
@@ -391,6 +538,14 @@ static void cmd_ntwrk_get_ip(void * x)
     console_printf(uart, "Board's IP: %s\r\n", temp);
 }
 
+static void cmd_ntwrk_get_rx_port(void *x)
+{
+    (void)x;
+    struct uart_funcs * uart = cpe_get_info()->uart;
+
+    console_printf(uart, "UDP RX Port: %d\r\n", ntwrk_get_udp_rx_port());
+}
+
 static void cmd_ntwrk_get_ssid(void * x)
 {
     struct uart_funcs * uart = cpe_get_info()->uart;
@@ -414,6 +569,14 @@ static void cmd_ntwrk_get_ssid_name(void * x)
     (void)x;
 
     console_printf(uart, "SSID Name: %s\r\n", ntwrk_get_ssid_name());
+}
+
+static void cmd_ntwrk_get_tx_port(void *x)
+{
+    (void)x;
+    struct uart_funcs * uart = cpe_get_info()->uart;
+
+    console_printf(uart, "UDP TX Port: %d\r\n", ntwrk_get_udp_tx_port());
 }
 
 static void cmd_ntwrk_help(void * x)
@@ -499,6 +662,53 @@ static void cmd_ntwrk_scan(void * x)
     }
 }
 
+static void cmd_ntwrk_send_decimal_int_string_int(void * x)
+{
+    struct cpe_info * info = cpe_get_info();
+    struct uart_funcs * uart = cpe_get_info()->uart;
+    (void)x;
+    char * end;
+    IPAddress addr;
+    String pkt;
+    char addr_c[13] = { 0 };
+
+    memcpy(addr_c, info->token[2].start, info->token[2].len);
+    addr.fromString(addr_c);
+    int led = (int)strtol(info->token[3].start, &end, 10);
+    int delay = (int)strtol(info->token[5].start, &end, 10);
+
+    if (!(strncasecmp(info->token[4].start, "blink", strlen("blink"))))
+    {
+        pkt = ntwrk_build_pkt(led, "blink", delay);
+    }
+    else if (!(strncasecmp(info->token[4].start, "static_on", strlen("static_on"))))
+    {
+        pkt = ntwrk_build_pkt(led, "static_on", delay);
+    }
+    else if (!(strncasecmp(info->token[4].start, "static_off", strlen("static_off"))))
+    {
+        pkt = ntwrk_build_pkt(led, "static_off", delay);
+    }
+    else
+    {
+        console_printf(uart, "Mode must be: blink, static_on, or static_off\r\n");
+        return;
+    }
+
+    ntwrk_send_pkt(addr, pkt);
+}
+
+static void cmd_ntwrk_set_rx_port_int(void * x)
+{
+    struct cpe_info * info = cpe_get_info();
+    struct uart_funcs * uart = cpe_get_info()->uart;
+    (void)x;
+    char * end;
+    const uint16_t port = (uint16_t)strtol(info->token[4].start, &end, 10);
+    ntwrk_set_udp_rx_port(port);
+    console_printf(uart, "UDP RX Port: %d\r\n", ntwrk_get_udp_rx_port());
+}
+
 static void cmd_ntwrk_set_ssid_name_str(void * x)
 {
     struct cpe_info * info = cpe_get_info();
@@ -541,6 +751,17 @@ static void cmd_ntwrk_set_ssid_pass_str(void * x)
         "Network SSID Password has been updated.\r\n");
 }
 
+static void cmd_ntwrk_set_tx_port_int(void * x)
+{
+    struct cpe_info * info = cpe_get_info();
+    struct uart_funcs * uart = cpe_get_info()->uart;
+    (void)x;
+    char * end;
+    const uint16_t port = (uint16_t)strtol(info->token[4].start, &end, 10);
+    ntwrk_set_udp_tx_port(port);
+    console_printf(uart, "UDP TX Port: %d\r\n", ntwrk_get_udp_tx_port());
+}
+
 static void cmd_ntwrk_status(void * x)
 {
     uint8_t status = ntwrk_get_wifi_status();
@@ -568,6 +789,7 @@ static void cmd_ntwrk_status(void * x)
         case WL_CONNECTED:
             console_printf(uart,
                 "Connected to a WiFi network\r\n");
+            ntwrk_udp_srvr_start();
             break;
         case WL_CONNECT_FAILED:
             console_printf(uart,

@@ -54,7 +54,11 @@ static const char * cpe_keyword_list[CPE_NUM_KEYWORDS] = {
     "delay",
     "connect",
     "ip",
-    "ping"
+    "ping",
+    "rx",
+    "tx",
+    "port",
+    "send"
 };
 
 static const cpe_token_keyword_t cpe_keyword_list_code[CPE_NUM_KEYWORDS] = {
@@ -72,7 +76,11 @@ static const cpe_token_keyword_t cpe_keyword_list_code[CPE_NUM_KEYWORDS] = {
     (cpe_token_keyword_t)CPE_KEYWORD_DELAY,
     (cpe_token_keyword_t)CPE_KEYWORD_CONNECT,
     (cpe_token_keyword_t)CPE_KEYWORD_IP,
-    (cpe_token_keyword_t)CPE_KEYWORD_PING
+    (cpe_token_keyword_t)CPE_KEYWORD_PING,
+    (cpe_token_keyword_t)CPE_KEYWORD_RX,
+    (cpe_token_keyword_t)CPE_KEYWORD_TX,
+    (cpe_token_keyword_t)CPE_KEYWORD_PORT,
+    (cpe_token_keyword_t)CPE_KEYWORD_SEND
 };
 
 //
